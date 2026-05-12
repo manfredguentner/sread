@@ -1,0 +1,51 @@
+.\" Manpage for sread
+.TH sread 1 "2026-05-13" "sread 1.0" "Terminal sleep read"
+.SH NAME
+sread \- terminal sleep read
+.SH SYNOPSIS
+.B sread
+.RI "-t" " <time-in-seconds>"
+.SH DESCRIPTION
+.B sread
+\(lq sleep read \(rq\) is a small C program that waits for a single keypress
+without requiring the Enter key. When a key is pressed, \fBsread\fP writes that
+key to stdout and ends the sleep early. If no key is pressed within the
+specified time, \fBsread\fP exits after the timeout.
+
+\fBsread\fP behaves like the standard \fBsleep\fP command, but it allows the
+sleep to be interrupted by a single keypress and returns that key on stdout.
+Fractional seconds are supported, for example:
+.PP
+.EX
+sread -t 1.22
+.EE
+.SH OPTIONS
+.TP
+.B -h
+Show a short usage message.
+.TP
+.B -t time
+Time to sleep in seconds; fractional values are allowed.
+.SH EXAMPLES
+.EX
+while true
+do
+  url=$(selectmusicstream)
+  duration=$(send_to_upnp_speaker "${url}")
+  key=$(sread -t "${duration}")
+
+  if [ "${key}" = "q" ]; then break; fi
+  if [ "${key}" = "+" ]; then incvolume; fi
+  if [ "${key}" = "-" ]; then decvolume; fi
+done
+.EE
+.SH BUGS
+Unknown; probably.
+.SH AUTHOR
+Written by Manfred Güntner
+.SH REPORTING BUGS
+https://github.com/manfredguentner/sread/issues
+.SH COPYRIGHT
+Copyright © 2026 Manfred Güntner
+.br
+This software is distributed under the BSD 2-Clause License; see the LICENSE file.
