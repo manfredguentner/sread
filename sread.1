@@ -4,7 +4,7 @@
 sread \- terminal sleep read
 .SH SYNOPSIS
 .B sread
-.RI "-t" " <time-in-seconds>"
+.RI "-t" " <time-in-seconds> [-p text]"
 .SH DESCRIPTION
 .B sread
 \(lq sleep read \(rq\) is a small C program that waits for a single keypress
@@ -26,6 +26,9 @@ Show a short usage message.
 .TP
 .B -t time
 Time to sleep in seconds; fractional values are allowed.
+.TP
+.B -p text
+Display text as statusbar.
 .SH EXAMPLES
 .EX
 while true
