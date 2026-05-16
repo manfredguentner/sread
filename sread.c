@@ -65,26 +65,38 @@ main(int argc, char **argv) {
   }
 
   /* open TTY for the prompt */
-  int td;
-  td = open("/dev/tty", O_WRONLY);
+  int td = -1;
+  td = open("/dev/tty", O_RDWR | O_NOCTTY);
   if (td == -1) {
     perror("open tty");
     return 1;
   }
 
+  /* tty fd exists, so use it. If tty fails fallback to stdin */
+  int r;
+  int usetty = 0;
   struct termios oldt, newt;
-  tcgetattr(STDIN_FILENO, &oldt);
-  newt = oldt;
-  newt.c_lflag &= ~(ICANON | ECHO);
-  tcsetattr(STDIN_FILENO, TCSANOW, &newt);
-  /* fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK); */
+  r = tcgetattr(td, &oldt);
+  if (r == -1) {
+    close(td);
+    td = STDIN_FILENO;
+  } else {
+    usetty = 1;
+    newt = oldt;
+    newt.c_lflag &= ~(ICANON | ECHO);
+    r = tcsetattr(td, TCSANOW, &newt);
+    if (r == -1) {
+      usetty = 0;
+      td = STDIN_FILENO;
+    }
+  }
 
   fd_set set;
   struct timeval tv;
   char c;
 
   FD_ZERO(&set);
-  FD_SET(STDIN_FILENO, &set);
+  FD_SET(td, &set);
   tv.tv_sec = (int)timeout;
   tv.tv_usec = (int)((timeout - (int)timeout) * 1000000);
 
@@ -95,27 +107,33 @@ main(int argc, char **argv) {
   write(td, "\r",1);
   write(td, "\033[0m",4);
 
-  int ret = select(STDIN_FILENO + 1, &set, NULL, NULL, &tv);
+  int ret = select(td + 1, &set, NULL, NULL, &tv);
   if (ret > 0) {
-    read(STDIN_FILENO, &c, 1);
+    read(td, &c, 1); 
     /* if key clear line and activate cursor and set terminal back */ 
     write(td, "\033[2K\r",5);
     write(td, "\033[?25h",6);
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
+    if ( usetty == 1) {
+      /* only reset if tty */
+      tcsetattr(td, TCSANOW, &oldt);
+    }
     printf("%c\n", c);
   } else {
     /* if timeout clear line and activate cursor and set terminal back */
     write(td, "\033[2K\r",5);
     write(td, "\033[?25h",6);
-    tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-    /* printf("");a */
+    if (usetty == 1) {
+      /* only reset if tty */
+      tcsetattr(td, TCSANOW, &oldt);
+    }
     puts("");
   }
 
-  /* close tty */
-  close(td);
-  /* tcsetattr(STDIN_FILENO, TCSANOW, &oldt);
-  fcntl(STDIN_FILENO, F_SETFL, ~O_NONBLOCK); */
-
+  /* close tty if used */
+  if ( usetty == 1) {
+    close(td);
+  }
+  
+  /* Thats all folks */
   return 0;
 }
