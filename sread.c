@@ -94,6 +94,10 @@ main(int argc, char **argv) {
   fd_set set;
   struct timeval tv;
   char c;
+  char c1;
+  char c2;
+  char c3;
+  char c4;
 
   FD_ZERO(&set);
   FD_SET(td, &set);
@@ -109,7 +113,165 @@ main(int argc, char **argv) {
 
   int ret = select(td + 1, &set, NULL, NULL, &tv);
   if (ret > 0) {
-    read(td, &c, 1); 
+
+  /* read key and try to parse it if ESC sequence */
+    ssize_t rb = 0;
+    int i = 0;
+    int isparsed = 0;
+    char keycode[20];
+    while (1) { 
+      rb = read(td, &c, 1);
+      /* not ESC: print printable or hex */
+      if (c != 27) {
+        if (c >= 32 && c <= 126) {
+          keycode[0] = c;
+          keycode[1] = '\0'; 
+        }
+        break;
+      }
+
+      /* before we ove on we have to do a 200ms wait
+         to see if it is ONLY the ESC key */
+
+      FD_ZERO(&set);
+      FD_SET(td, &set);
+      tv.tv_sec = 0;
+      tv.tv_usec = 200000; /* 200 ms */
+      /* if select times out it is the Esc key */
+      if (select(td + 1, &set, NULL, NULL, &tv) <= 0) {
+        strcpy(keycode,"ESC");
+        isparsed = 1;
+        break;
+      } else {
+        rb = read(td, &c1, 1);
+      }
+      /* An now we go on a long journey to hopefully get all
+         105/104 ISO keyboard keys. I dont have mucht to test.. */
+
+      if (c1 == '[') {
+        rb = read(td, &c2, 1); 
+        switch (c2) {
+          case 'A': strcpy(keycode,"KEY_UP"); 
+                    isparsed = 1;
+                    break;
+          case 'B': strcpy(keycode,"KEY_DOWN"); 
+                    isparsed = 1;
+                    break;
+          case 'C': strcpy(keycode,"KEY_RIGHT"); 
+                    isparsed = 1;
+                    break;
+          case 'D': strcpy(keycode,"KEY_LEFT"); 
+                    isparsed = 1;
+                    break;
+          case 'H': strcpy(keycode,"KEY_HOME"); 
+                    isparsed = 1;
+                    break;
+          case 'F': strcpy(keycode,"KEY_END"); 
+                    isparsed = 1;
+                    break;
+          case '1': strcpy(keycode,"KEY_HOME"); 
+                    read(td, &c3, 1);
+                    /* for two digit codes we have to read on */
+                    if (c3 >= '0' && c3 <= '9') {
+                      switch (c3) {
+                        case '5': strcpy(keycode,"KEY_F5");
+                                  read(td, &c4, 1);
+                                  break;
+                        case '7': strcpy(keycode,"KEY_F6");
+                                  read(td, &c4, 1);
+                                  break;
+                        case '8': strcpy(keycode,"KEY_F7");
+                                  read(td, &c4, 1);
+                                  break;
+                        case '9': strcpy(keycode,"KEY_F8");
+                                  read(td, &c4, 1);
+                                  break;
+                      }
+                    }
+                    isparsed = 1;
+                    break;
+          case '2': strcpy(keycode,"KEY_INSERT"); 
+                    read(td, &c3, 1);
+                    /* the twenties codes */
+                    if (c3 >= '0' && c3 <= '9') {
+                      switch (c3) {
+                        case '0': strcpy(keycode,"KEY_F9");
+                                  read(td, &c4, 1);
+                                  break;  
+                        case '1': strcpy(keycode,"KEY_F10");
+                                  read(td, &c4, 1);
+                                  break;  
+                        case '3': strcpy(keycode,"KEY_11");
+                                  read(td, &c4, 1);
+                                  break;  
+                        case '4': strcpy(keycode,"KEY_F12");
+                                  read(td, &c4, 1);
+                                  break;  
+                      }
+                    }
+                    isparsed = 1;
+                    break;
+          case '3': strcpy(keycode,"KEY_DELETE"); 
+                    read(td, &c3, 1);
+                    isparsed = 1;
+                    break;
+          case '4': strcpy(keycode,"KEY_END"); 
+                    read(td, &c3, 1);
+                    isparsed = 1;
+                    break;
+          case '5': strcpy(keycode,"KEY_PGUP"); 
+                    read(td, &c3, 1);
+                    isparsed = 1;
+                    break;
+          case '6': strcpy(keycode,"KEY_PGDN"); 
+                    read(td, &c3, 1);
+                    isparsed = 1;
+                    break;
+        }  
+        if (isparsed == 1) {
+          break;
+        }
+      /* There is not only [. There is also O */
+      } else if (c1 == 'O') {
+        rb = read(td, &c2, 1);
+        switch (c2) {
+          case 'A': strcpy(keycode,"KEY_UP"); 
+                    isparsed = 1;
+                    break;
+          case 'B': strcpy(keycode,"KEY_DOWN");
+                    isparsed = 1;
+                    break;
+          case 'C': strcpy(keycode,"KEY_RIGHT");
+                    isparsed = 1;
+                    break;
+          case 'D': strcpy(keycode,"KEY_LEFT");
+                    isparsed = 1;
+                    break;
+          case 'H': strcpy(keycode,"KEY_HOME");
+                    isparsed = 1;
+                    break;
+          case 'F': strcpy(keycode,"KEY_END");
+                    isparsed = 1;
+                    break;
+          case 'P': strcpy(keycode,"KEY_F1");
+                    isparsed = 1;
+                    break;
+          case 'Q': strcpy(keycode,"KEY_F2");
+                    isparsed = 1;
+                    break;
+          case 'R': strcpy(keycode,"KEY_F3");
+                    isparsed = 1;
+                    break;
+          case 'S': strcpy(keycode,"KEY_F4");
+                    isparsed = 1;
+                    break;
+        }
+      }
+      if (isparsed == 1) {
+        break;
+      }
+    }
+
     /* if key clear line and activate cursor and set terminal back */ 
     write(td, "\033[2K\r",5);
     write(td, "\033[?25h",6);
@@ -117,7 +279,8 @@ main(int argc, char **argv) {
       /* only reset if tty */
       tcsetattr(td, TCSANOW, &oldt);
     }
-    printf("%c\n", c);
+    /* Print keycode */
+    printf("%s\n", keycode);
   } else {
     /* if timeout clear line and activate cursor and set terminal back */
     write(td, "\033[2K\r",5);
@@ -126,6 +289,7 @@ main(int argc, char **argv) {
       /* only reset if tty */
       tcsetattr(td, TCSANOW, &oldt);
     }
+    /* print no keycode */
     puts("");
   }
 
