@@ -15,7 +15,7 @@
 
 
 void usage() {
-  printf("Usage: -t timeout\n");
+  printf("Usage: -t timeout [-p text]\n");
 }
 
 int 
@@ -174,6 +174,21 @@ main(int argc, char **argv) {
                     /* for two digit codes we have to read on */
                     if (c3 >= '0' && c3 <= '9') {
                       switch (c3) {
+                        case '0': strcpy(keycode,"KEY_F0");
+                                  read(td, &c4, 1);
+                                  break;
+                        case '1': strcpy(keycode,"KEY_F1");
+                                  read(td, &c4, 1);
+                                  break;
+                        case '2': strcpy(keycode,"KEY_F2");
+                                  read(td, &c4, 1);
+                                  break;
+                        case '3': strcpy(keycode,"KEY_F3");
+                                  read(td, &c4, 1);
+                                  break;
+                        case '4': strcpy(keycode,"KEY_F4");
+                                  read(td, &c4, 1);
+                                  break;
                         case '5': strcpy(keycode,"KEY_F5");
                                   read(td, &c4, 1);
                                   break;
@@ -207,12 +222,41 @@ main(int argc, char **argv) {
                         case '4': strcpy(keycode,"KEY_F12");
                                   read(td, &c4, 1);
                                   break;  
+                        case '5': strcpy(keycode,"KEY_F13");
+                                  read(td, &c4, 1);
+                                  break;  
+                        case '6': strcpy(keycode,"KEY_F14");
+                                  read(td, &c4, 1);
+                                  break;  
+                        case '8': strcpy(keycode,"KEY_F15");
+                                  read(td, &c4, 1);
+                                  break;  
+                        case '9': strcpy(keycode,"KEY_F16");
+                                  read(td, &c4, 1);
+                                  break;  
                       }
                     }
                     isparsed = 1;
                     break;
           case '3': strcpy(keycode,"KEY_DELETE"); 
                     read(td, &c3, 1);
+                    /* the 30ies */
+                    if (c3 >= '0' && c3 <= '9') {
+                      switch (c3) {
+                        case '1': strcpy(keycode,"KEY_F17");
+                                  read(td, &c4, 1);
+                                  break;
+                        case '2': strcpy(keycode,"KEY_F18");
+                                  read(td, &c4, 1);
+                                  break;
+                        case '3': strcpy(keycode,"KEY_F19");
+                                  read(td, &c4, 1);
+                                  break;
+                        case '4': strcpy(keycode,"KEY_F20");
+                                  read(td, &c4, 1);
+                                  break;
+                      }
+                    }
                     isparsed = 1;
                     break;
           case '4': strcpy(keycode,"KEY_END"); 
@@ -224,6 +268,14 @@ main(int argc, char **argv) {
                     isparsed = 1;
                     break;
           case '6': strcpy(keycode,"KEY_PGDN"); 
+                    read(td, &c3, 1);
+                    isparsed = 1;
+                    break;
+          case '7': strcpy(keycode,"KEY_HOME"); 
+                    read(td, &c3, 1);
+                    isparsed = 1;
+                    break;
+          case '8': strcpy(keycode,"KEY_END"); 
                     read(td, &c3, 1);
                     isparsed = 1;
                     break;
@@ -247,10 +299,22 @@ main(int argc, char **argv) {
           case 'D': strcpy(keycode,"KEY_LEFT");
                     isparsed = 1;
                     break;
+          case 'F': strcpy(keycode,"KEY_END");
+                    isparsed = 1;
+                    break;
+          case 'G': strcpy(keycode,"KEY_KP5");
+                    isparsed = 1;
+                    break;
           case 'H': strcpy(keycode,"KEY_HOME");
                     isparsed = 1;
                     break;
-          case 'F': strcpy(keycode,"KEY_END");
+          case 'K': strcpy(keycode,"KEY_KP0");
+                    isparsed = 1;
+                    break;
+          case 'L': strcpy(keycode,"KEY_KP1");
+                    isparsed = 1;
+                    break;
+          case 'M': strcpy(keycode,"KEY_KPENTER");
                     isparsed = 1;
                     break;
           case 'P': strcpy(keycode,"KEY_F1");
@@ -263,6 +327,63 @@ main(int argc, char **argv) {
                     isparsed = 1;
                     break;
           case 'S': strcpy(keycode,"KEY_F4");
+                    isparsed = 1;
+                    break;
+          case 'n': strcpy(keycode,"KEY_F13");
+                    isparsed = 1;
+                    break;
+          case 'o': strcpy(keycode,"KEY_F14");
+                    isparsed = 1;
+                    break;
+          case 'q': strcpy(keycode,"KEY_F5");
+                    isparsed = 1;
+                    break;
+          case 'r': strcpy(keycode,"KEY_F6");
+                    isparsed = 1;
+                    break;
+          case 's': strcpy(keycode,"KEY_F7");
+                    isparsed = 1;
+                    break;
+          case 't': strcpy(keycode,"KEY_F8");
+                    isparsed = 1;
+                    break;
+          case 'u': strcpy(keycode,"KEY_F9");
+                    isparsed = 1;
+                    break;
+          case 'v': strcpy(keycode,"KEY_F10");
+                    isparsed = 1;
+                    break;
+          case 'w': strcpy(keycode,"KEY_F11");
+                    isparsed = 1;
+                    break;
+          case 'x': strcpy(keycode,"KEY_F12");
+                    isparsed = 1;
+                    break;
+          case ';': strcpy(keycode,"KEY_KP2");
+                    isparsed = 1;
+                    break;
+          case '2': strcpy(keycode,"KEY_KP2");
+                    isparsed = 1;
+                    break;
+          case '3': strcpy(keycode,"KEY_KP3");
+                    isparsed = 1;
+                    break;
+          case '4': strcpy(keycode,"KEY_KP4");
+                    isparsed = 1;
+                    break;
+          case '5': strcpy(keycode,"KEY_KP5");
+                    isparsed = 1;
+                    break;
+          case '6': strcpy(keycode,"KEY_KP6");
+                    isparsed = 1;
+                    break;
+          case '7': strcpy(keycode,"KEY_KP7");
+                    isparsed = 1;
+                    break;
+          case '8': strcpy(keycode,"KEY_KP8");
+                    isparsed = 1;
+                    break;
+          case '9': strcpy(keycode,"KEY_KP9");
                     isparsed = 1;
                     break;
         }
