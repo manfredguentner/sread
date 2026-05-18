@@ -16,7 +16,7 @@ NAME
        sread - terminal sleep read
 
 SYNOPSIS
-       sread -t <time-in-seconds> [-p text]
+       sread -t <time-in-seconds> [-n][-p text]
 
 DESCRIPTION
        sread (sleep read) is a small C program that waits for a single
@@ -39,6 +39,8 @@ OPTIONS
 
        -p text
            Display text as statusbar.
+       
+       -n  If -p is set, -n disables reverse video.
 
 EXAMPLES
        while true

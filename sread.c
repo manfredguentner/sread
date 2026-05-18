@@ -15,7 +15,7 @@
 
 
 void usage() {
-  printf("Usage: -t timeout [-p text]\n");
+  printf("Usage: -t timeout [-n][-p text]\n");
 }
 
 int 
@@ -25,14 +25,18 @@ main(int argc, char **argv) {
   double timeout = 0.000;
   char prompt[1024];
   int promptlen = 0;
+  int rvflag = 0;
  
-  while ((op = getopt (argc, argv, "ht:p:")) != -1)
+  while ((op = getopt (argc, argv, "hnt:p:")) != -1)
   {
     switch (op)
       {
       case 'h':
         usage();
         return 0;
+      case 'n':
+        rvflag = 1;
+        break;
       case 't':
         /* cvalue = optarg; */
         timeout = strtod(optarg, NULL);
@@ -105,12 +109,17 @@ main(int argc, char **argv) {
   tv.tv_usec = (int)((timeout - (int)timeout) * 1000000);
 
   /* while in raw mode lowlevel write ist required */
+  /* disable reverse video if -n was set */
   write(td, "\033[?25l",6);
-  write(td, "\033[7m",4);
+  if (rvflag == 0) {
+    write(td, "\033[7m",4);
+  }
   write(td, prompt, promptlen);
   write(td, "\r",1);
-  write(td, "\033[0m",4);
-
+  
+  if (rvflag == 0) {
+    write(td, "\033[0m",4);
+  }
   int ret = select(td + 1, &set, NULL, NULL, &tv);
   if (ret > 0) {
 
