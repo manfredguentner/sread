@@ -1,13 +1,12 @@
 
-build should be straight forward and even with c89
+build should be straight forward. source is c89 
+Makefile requires pkg-config
 
-cc -std=c89 sread.c -o sread -s -Os -Wall
+make install [prefix=/your/path/]
 
-copy the binary into your $PATH
-copy sread.1 into your manpath. 
-I encourage $HOME/man/man1  
+make debug 
+      shows the compiler flags without doing anything.
 
-How to get this done depends on your Distro..
 
 
 sread(1)               Terminal sleep read               sread(1)
