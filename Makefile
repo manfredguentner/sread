@@ -7,14 +7,16 @@ mandir = $(prefix)/share/man/man1
 # Compiler and flags
 CC      = cc
 PKGCONFIG?= pkg-config
-PKGNAME= ncurses gpgme
+PKGNAME= 
 
-PKG_CFLAGS!= ${PKGCONFIG} --cflags ${PKGNAME}
-PKG_LIBS!=   ${PKGCONFIG} --libs   ${PKGNAME}
+#PKG_CFLAGS!= ${PKGCONFIG} --cflags ${PKGNAME}
+#PKG_LIBS!=   ${PKGCONFIG} --libs   ${PKGNAME}
 
-CFLAGS+= -std=c89 -Os -Wall ${PKG_CFLAGS}
+#CFLAGS+= -std=c89 -Os -Wall ${PKG_CFLAGS}
+CFLAGS+= -std=c89 -Os -Wall
 LDFLAGS+= -s
-LDADD+= ${PKG_LIBS}
+LDADD+= ${LDFLAGS}
+#LDADD+= ${PKG_LIBS}
 
 # Project files
 TARGET  = sread
@@ -24,6 +26,7 @@ SRC     = sread.c
 # Default rule
 all:
 
+	#$(CC) $(SRC) -o $(TARGET) $(CFLAGS) $(LDADD)
 	$(CC) $(SRC) -o $(TARGET) $(CFLAGS) $(LDADD)
 
 # Install binary into $(prefix)/bin
