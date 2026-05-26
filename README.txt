@@ -1,6 +1,5 @@
 
 build should be straight forward. source is c89 
-Makefile requires pkg-config
 
 make install [prefix=/your/path/]
 
